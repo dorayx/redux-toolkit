@@ -1,0 +1,39 @@
+---
+id: setupListeners
+title: setupListeners
+sidebar_label: setupListeners
+hide_title: true
+hide_table_of_contents: false
+description: 'RTK Query > API: setupListeners reference'
+---
+
+&nbsp;
+
+# `setupListeners`
+
+A utility used to enable `refetchOnFocus` and `refetchOnReconnect` behaviors. It requires the `dispatch` method from your store. Calling `setupListeners(store.dispatch)` will configure listeners with the recommended defaults, but you have the option of providing a callback for more granular control.
+
+The default handler adds one set of `focus`, `visibilitychange`, `online` and `offline` listeners to `window` and dispatches the matching action to every store that called `setupListeners`. It returns an `unsubscribe` function that stops sending events to that store. The window listeners are removed once every store has unsubscribed. A store that never unsubscribes keeps receiving events for as long as the page is open, so call `unsubscribe` when you discard a store, for example between tests.
+
+A custom handler receives the store's `dispatch` and the four actions, and returns its own cleanup function:
+
+```ts title="setupListeners signature" no-transpile
+export function setupListeners(
+  dispatch: ThunkDispatch<any, any, any>,
+  customHandler?: (
+    dispatch: ThunkDispatch<any, any, any>,
+    actions: {
+      onFocus: typeof onFocus
+      onFocusLost: typeof onFocusLost
+      onOnline: typeof onOnline
+      onOffline: typeof onOffline
+    },
+  ) => () => void,
+): () => void
+```
+
+If you notice, `onFocus`, `onFocusLost`, `onOffline`, `onOnline` are all actions that are provided to the callback. Additionally, these actions are made available to `api.internalActions` and are able to be used by dispatching them like this:
+
+```ts title="Manual onFocus event" no-transpile
+dispatch(api.internalActions.onFocus())
+```

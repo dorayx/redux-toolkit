@@ -1,0 +1,17 @@
+{
+  // For runtime and type tests during CI.
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "jsx": "react-jsx"
+  },
+  // `hovers.test.ts` uses the TS 6 language service API, which TS 7 does not
+  // export. It still runs under vitest with the repo's TS version.
+  "exclude": ["dist", "src/tests/hovers/hovers.test.ts"],
+  "include": [
+    "src/**/*.test.ts*",
+    "src/**/*.test-d.ts*",
+    "src/**/*.spec.ts*",
+    "src/**/tests/**/*",
+    "src/**/*.typetest.ts*"
+  ]
+}

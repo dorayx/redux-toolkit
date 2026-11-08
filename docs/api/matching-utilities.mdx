@@ -5,6 +5,8 @@ sidebar_label: Matching Utilities
 hide_title: true
 ---
 
+&nbsp;
+
 # Matching Utilities
 
 Redux Toolkit exports several type-safe action matching utilities that you can leverage when checking for specific kinds of actions. These are primarily useful for the `builder.addMatcher()` cases in `createSlice` and `createReducer`, as well as when writing custom middleware.
@@ -29,9 +31,9 @@ All these matchers can either be called with one or more thunks as arguments, in
 A higher-order function that accepts one or more of:
 
 - `redux-toolkit` action creator functions such as the ones produced by:
-  - [`createAction`](./createAction)
-  - [`createSlice`](./createSlice#return-value)
-  - [`createAsyncThunk`](./createAsyncThunk#promise-lifecycle-actions)
+  - [`createAction`](./createAction.mdx)
+  - [`createSlice`](./createSlice.mdx#return-value)
+  - [`createAsyncThunk`](./createAsyncThunk.mdx#promise-lifecycle-actions)
 - type guard functions
 - custom action creator functions that have a `.match` property that is a type guard
 
@@ -43,15 +45,16 @@ Accepts the same inputs as `isAllOf` and will return a type guard function that 
 
 ## `isAsyncThunkAction`
 
-A higher-order function that returns a type guard function that may be used to check whether an action was created by [`createAsyncThunk`](./createAsyncThunk).
+A higher-order function that returns a type guard function that may be used to check whether an action was created by [`createAsyncThunk`](./createAsyncThunk.mdx).
 
 ```ts title="isAsyncThunkAction usage"
-import { isAsyncThunkAction, AnyAction } from '@reduxjs/toolkit'
+import { isAsyncThunkAction } from '@reduxjs/toolkit'
+import type { UnknownAction } from '@reduxjs/toolkit'
 import { requestThunk1, requestThunk2 } from '@virtual/matchers'
 
 const isARequestAction = isAsyncThunkAction(requestThunk1, requestThunk2)
 
-function handleRequestAction(action: AnyAction) {
+function handleRequestAction(action: UnknownAction) {
   if (isARequestAction(action)) {
     // action is an action dispatched by either `requestThunk1` or `requestThunk2`
   }
@@ -63,12 +66,13 @@ function handleRequestAction(action: AnyAction) {
 A higher-order function that returns a type guard function that may be used to check whether an action is a 'pending' action creator from the `createAsyncThunk` promise lifecycle.
 
 ```ts title="isPending usage"
-import { isPending, AnyAction } from '@reduxjs/toolkit'
+import { isPending } from '@reduxjs/toolkit'
+import type { UnknownAction } from '@reduxjs/toolkit'
 import { requestThunk1, requestThunk2 } from '@virtual/matchers'
 
 const isAPendingAction = isPending(requestThunk1, requestThunk2)
 
-function handlePendingAction(action: AnyAction) {
+function handlePendingAction(action: UnknownAction) {
   if (isAPendingAction(action)) {
     // action is a pending action dispatched by either `requestThunk1` or `requestThunk2`
   }
@@ -80,12 +84,13 @@ function handlePendingAction(action: AnyAction) {
 A higher-order function that returns a type guard function that may be used to check whether an action is a 'fulfilled'' action creator from the `createAsyncThunk` promise lifecycle.
 
 ```ts title="isFulfilled usage"
-import { isFulfilled, AnyAction } from '@reduxjs/toolkit'
+import { isFulfilled } from '@reduxjs/toolkit'
+import type { UnknownAction } from '@reduxjs/toolkit'
 import { requestThunk1, requestThunk2 } from '@virtual/matchers'
 
 const isAFulfilledAction = isFulfilled(requestThunk1, requestThunk2)
 
-function handleFulfilledAction(action: AnyAction) {
+function handleFulfilledAction(action: UnknownAction) {
   if (isAFulfilledAction(action)) {
     // action is a fulfilled action dispatched by either `requestThunk1` or `requestThunk2`
   }
@@ -97,12 +102,13 @@ function handleFulfilledAction(action: AnyAction) {
 A higher-order function that returns a type guard function that may be used to check whether an action is a 'rejected' action creator from the `createAsyncThunk` promise lifecycle.
 
 ```ts title="isRejected usage"
-import { isRejected, AnyAction } from '@reduxjs/toolkit'
+import { isRejected } from '@reduxjs/toolkit'
+import type { UnknownAction } from '@reduxjs/toolkit'
 import { requestThunk1, requestThunk2 } from '@virtual/matchers'
 
 const isARejectedAction = isRejected(requestThunk1, requestThunk2)
 
-function handleRejectedAction(action: AnyAction) {
+function handleRejectedAction(action: UnknownAction) {
   if (isARejectedAction(action)) {
     // action is a rejected action dispatched by either `requestThunk1` or `requestThunk2`
   }
@@ -111,18 +117,19 @@ function handleRejectedAction(action: AnyAction) {
 
 ## `isRejectedWithValue`
 
-A higher-order function that returns a type guard function that may be used to check whether an action is a 'rejected' action creator from the `createAsyncThunk` promise lifecycle that was created by [`rejectWithValue`](./createAsyncThunk#handling-thunk-errors).
+A higher-order function that returns a type guard function that may be used to check whether an action is a 'rejected' action creator from the `createAsyncThunk` promise lifecycle that was created by [`rejectWithValue`](./createAsyncThunk.mdx#handling-thunk-errors).
 
 ```ts title="isRejectedWithValue usage"
-import { isRejectedWithValue, AnyAction } from '@reduxjs/toolkit'
+import { isRejectedWithValue } from '@reduxjs/toolkit'
+import type { UnknownAction } from '@reduxjs/toolkit'
 import { requestThunk1, requestThunk2 } from '@virtual/matchers'
 
 const isARejectedWithValueAction = isRejectedWithValue(
   requestThunk1,
-  requestThunk2
+  requestThunk2,
 )
 
-function handleRejectedWithValueAction(action: AnyAction) {
+function handleRejectedWithValueAction(action: UnknownAction) {
   if (isARejectedWithValueAction(action)) {
     // action is a rejected action dispatched by either `requestThunk1` or `requestThunk2`
     // where rejectWithValue was used
@@ -138,11 +145,8 @@ we're able to easily use the same matcher for several cases in a type-safe manne
 First, let's examine an unnecessarily complex example:
 
 ```ts title="Example without using a matcher utility"
-import {
-  createAsyncThunk,
-  createReducer,
-  PayloadAction
-} from '@reduxjs/toolkit'
+import { createAsyncThunk, createReducer } from '@reduxjs/toolkit'
+import type { PayloadAction } from '@reduxjs/toolkit'
 
 interface Data {
   isInteresting: boolean
@@ -158,13 +162,13 @@ interface Interesting extends Data {
 }
 
 function isSpecial(
-  action: PayloadAction<Data>
+  action: PayloadAction<Data>,
 ): action is PayloadAction<Special> {
   return action.payload.isSpecial
 }
 
 function isInteresting(
-  action: PayloadAction<Data>
+  action: PayloadAction<Data>,
 ): action is PayloadAction<Interesting> {
   return action.payload.isInteresting
 }
@@ -176,21 +180,21 @@ interface ExampleState {
 
 const initialState = {
   isSpecial: false,
-  isInteresting: false
-} as ExampleState
+  isInteresting: false,
+} satisfies ExampleState as ExampleState
 
 export const isSpecialAndInterestingThunk = createAsyncThunk(
   'isSpecialAndInterestingThunk',
   () => {
     return {
       isSpecial: true,
-      isInteresting: true
+      isInteresting: true,
     }
-  }
+  },
 )
 
 // This has unnecessary complexity
-const loadingReducer = createReducer(initialState, builder => {
+const loadingReducer = createReducer(initialState, (builder) => {
   builder.addCase(isSpecialAndInterestingThunk.fulfilled, (state, action) => {
     if (isSpecial(action)) {
       state.isSpecial = true
@@ -211,22 +215,22 @@ import {
   initialState,
   isSpecial,
   isInteresting,
-  Data
 } from '@virtual/matchers' // This is a fake pkg that provides the types shown above
+import type { Data } from '@virtual/matchers' // This is a fake pkg that provides the types shown above
 
-const loadingReducer = createReducer(initialState, builder => {
+const loadingReducer = createReducer(initialState, (builder) => {
   builder
     .addMatcher(
       isAllOf(isSpecialAndInterestingThunk.fulfilled, isSpecial),
       (state, action) => {
         state.isSpecial = true
-      }
+      },
     )
     .addMatcher(
       isAllOf(isSpecialAndInterestingThunk.fulfilled, isInteresting),
       (state, action) => {
         state.isInteresting = true
-      }
+      },
     )
 })
 ```
@@ -236,8 +240,10 @@ const loadingReducer = createReducer(initialState, builder => {
 The function returned by `isAllOf` and `isAnyOf` can also be used as a TypeScript type guard in other contexts.
 
 ```ts title="Using isAllOf as a type guard"
-import { isAllOf, PayloadAction } from '@reduxjs/toolkit'
-import { Data, isSpecial, isInteresting } from '@virtual/matchers' // This is a fake pkg that provides the types shown above
+import { isAllOf } from '@reduxjs/toolkit'
+import type { PayloadAction } from '@reduxjs/toolkit'
+import { isSpecial, isInteresting } from '@virtual/matchers' // This is a fake pkg that provides the types shown above
+import type { Data } from '@virtual/matchers' // This is a fake pkg that provides the types shown above
 
 const isSpecialAndInteresting = isAllOf(isSpecial, isInteresting)
 
@@ -250,7 +256,8 @@ function someFunction(action: PayloadAction<Data>) {
 ```
 
 ```ts title="Using isAnyOf as a type guard"
-import { isAnyOf, PayloadAction } from '@reduxjs/toolkit'
+import { isAnyOf } from '@reduxjs/toolkit'
+import type { PayloadAction } from '@reduxjs/toolkit'
 import { Data, isSpecial, isInteresting } from '@virtual/matchers' // this is a fake pkg that provides the types shown above
 
 const isSpecialOrInteresting = isAnyOf(isSpecial, isInteresting)
@@ -267,7 +274,13 @@ function someFunction(action: PayloadAction<Data>) {
 
 <iframe
   src="https://codesandbox.io/embed/redux-toolkit-matchers-example-e765q?fontsize=14&hidenavigation=1&module=%2Fsrc%2Ffeatures%2Fcounter%2FcounterSlice.ts&theme=dark&runonclick=1"
-  style={{width:'100%', height:'500px', border:0, borderRadius: 4, overflow:'hidden'}}
+  style={{
+    width: '100%',
+    height: '500px',
+    border: 0,
+    borderRadius: 4,
+    overflow: 'hidden',
+  }}
   title="redux-toolkit-matchers-example"
   allow="accelerometer; ambient-light-sensor; camera; encrypted-media; geolocation; gyroscope; hid; microphone; midi; payment; usb; vr; xr-spatial-tracking"
   sandbox="allow-forms allow-modals allow-popups allow-presentation allow-same-origin allow-scripts"
